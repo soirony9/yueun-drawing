@@ -1331,7 +1331,7 @@ function printImage(e) {
       var s=document.createElement('style');
       s.textContent='@page{size:'+(this.naturalWidth>this.naturalHeight?'landscape':'portrait')+';margin:0;}';
       document.head.appendChild(s);
-      window.print();
+      window.print(); window.close();
     ">
   </body></html>`);
   pw.document.close();
