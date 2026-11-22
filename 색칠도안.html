@@ -29,6 +29,8 @@
   .modal-footer { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
   .modal-name { background: rgba(233,30,140,0.9); color: white; padding: 10px 20px; border-radius: 30px; font-size: 1rem; font-weight: 700; white-space: nowrap; }
   .btn-print { background: white; color: #e91e8c; border: 2px solid #e91e8c; padding: 10px 20px; border-radius: 30px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s; min-height: 44px; -webkit-tap-highlight-color: transparent; }
+  a.btn-print { text-decoration: none; display: inline-flex; align-items: center; }
+  .ver { color: rgba(255,255,255,0.6); font-size: 0.75rem; width: 100%; text-align: center; }
   .btn-print:hover { background: #e91e8c; color: white; }
   .btn-print:active { background: #e91e8c; color: white; }
   .hidden { display: none !important; }
@@ -81,6 +83,8 @@
   <div class="modal-footer" onclick="event.stopPropagation()">
     <span class="modal-name" id="modal-name"></span>
     <button class="btn-print" onclick="printImage(event)">🖨️ 인쇄</button>
+    <a class="btn-print" id="open-img" href="#" target="_blank" rel="noopener" onclick="event.stopPropagation(); this.href=document.getElementById('modal-img').src">🖼️ 사진만 열기</a>
+    <span class="ver">인쇄 v4</span>
   </div>
 </div>
 <script>
