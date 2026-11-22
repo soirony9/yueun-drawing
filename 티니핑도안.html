@@ -37,21 +37,7 @@
     .group-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
     .card img { height: 200px; }
   }
-  #print-area { display: none; }
-  @media print {
-    body { background: white !important; padding: 0 !important; }
-    body > *:not(#print-area) { display: none !important; }
-    #print-area { display: block !important; }
-    html, body { height: 100% !important; margin: 0 !important; overflow: hidden !important; }
-    #print-area { box-sizing: border-box; height: 100%; padding: 7mm; }
-    #print-area img { display: block; width: 100%; height: 100%; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  }
   .card { position: relative; }
-  /* 선택 표시: 옛 iPad 사파리에서도 보이게 inset/outline 대신 기본 속성만 사용 */
-  .card.picked { box-shadow: 0 0 0 5px #e91e8c !important; outline: 5px solid #e91e8c; transition: none; }
-  .card.picked img { opacity: 0.35; }
-  .card .mark { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; font-size: 3.2rem; pointer-events: none; }
-  .card.picked .mark { display: flex; }
 </style>
 </head>
 <body>
@@ -1290,60 +1276,39 @@ function filterGroups() {
     g.classList.toggle('hidden', q !== '' && !name.includes(q));
   });
 }
-// 화면 근처에 온 도안은 원본을 미리 불러둠 → 누르면 그 자리에서 바로 인쇄 (iOS는 누른 순간에 print 해야 차단 안 함)
-const fullCache = new Map();
-function fullImg(src) {
-  const key = new URL(src, location.href).href;
-  let im = fullCache.get(key);
-  if (!im) { im = new Image(); im.src = src; fullCache.set(key, im); }
-  return im;
-}
-const cardSrc = c => c.dataset.full || c.querySelector('img').getAttribute('src');
-if ('IntersectionObserver' in window) {
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    if (e.isIntersecting) { fullImg(cardSrc(e.target)); io.unobserve(e.target); }
-  }), { rootMargin: '800px 0px' });
-  document.querySelectorAll('.card').forEach(c => io.observe(c));
-}
-let picked = null;
-function unpick() { if (picked) { picked.classList.remove('picked'); picked = null; } }
+// 도안을 누르면 → 그 사진 한 장만 있는 새 창이 열리며 바로 인쇄 (예전에 iPad에서 차단 없이 되던 방식)
 function pick(card, src) {
-  const im = fullImg(src);
-  if (im.complete && im.naturalWidth) { unpick(); printNow(im); return; }
-  // 아직 원본을 못 불러왔으면 ⏳ 표시 → 다 불러오면 🖨️ (그때 한 번 더 누르면 인쇄)
-  unpick(); picked = card; card.classList.add('picked');
-  let mark = card.querySelector('.mark');
-  if (!mark) { mark = document.createElement('span'); mark.className = 'mark'; card.appendChild(mark); }
-  mark.textContent = '⏳';
-  im.addEventListener('load', () => { if (picked === card) mark.textContent = '🖨️'; }, { once: true });
+  const url = new URL(src, location.href).href;
+  const pw = window.open('', '_blank');
+  if (!pw) { location.href = url; return; }   // 팝업이 막히면 사진으로 이동 (공유 → 프린트)
+  pw.document.write(`<!DOCTYPE html><html><head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>인쇄</title>
+  <style>
+    @page { margin: 0; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: white; }
+    body { box-sizing: border-box; padding: 7mm; }   /* 가장자리 잘림 방지 */
+    img { display: block; width: 100%; height: 100%; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #close-btn { position: fixed; top: 16px; right: 16px; padding: 18px 30px; border-radius: 40px; background: #e91e8c; color: white; font-size: 1.6rem; font-weight: 800; border: none; display: none; z-index: 9999; box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+    @media print { #close-btn { display: none !important; } }
+  </style>
+  </head><body>
+  <button id="close-btn" onclick="window.close()">✕ 닫기</button>
+  <img id="pimg" src="${url}">
+  <script>
+    var img = document.getElementById('pimg');
+    var btn = document.getElementById('close-btn');
+    img.onload = function() {
+      var s = document.createElement('style');
+      s.textContent = '@page{size:A4 ' + (this.naturalWidth > this.naturalHeight ? 'landscape' : 'portrait') + ';margin:0;}';
+      document.head.appendChild(s);
+      window.addEventListener('afterprint', function(){ window.close(); });
+      window.print();
+      btn.style.display = 'block';
+    };
+  </scr` + `ipt>
+  </body></html>`);
+  pw.document.close();
 }
-function printFrame() {
-  // 인쇄 전용 숨은 창(iframe). 큰 페이지는 사진을 계속 불러오는 중이라 거기서 print 하면
-  // 사파리가 인쇄를 미뤘다가 '자동 프린트'로 보고 차단함 → 사진 한 장만 있는 창에서 인쇄
-  let f = document.getElementById('print-frame');
-  if (!f) {
-    f = document.createElement('iframe'); f.id = 'print-frame'; f.setAttribute('aria-hidden', 'true'); f.tabIndex = -1;
-    f.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;opacity:0;pointer-events:none;z-index:-1;';
-    document.body.appendChild(f);
-    const d = f.contentDocument; d.open();
-    d.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style id="ps"></style></head><body style="margin:0;background:#fff"><img id="p" alt=""></body></html>');
-    d.close();
-  }
-  return f;
-}
-function printNow(im) {
-  const land = im.naturalWidth > im.naturalHeight;
-  const f = printFrame(), d = f.contentDocument;
-  // 여백 0 → 사파리가 머리글·바닥글을 안 넣음. 종이 크기(100%)에 맞춰 줄이고 안쪽 7mm 여백으로 가장자리 잘림 방지
-  d.getElementById('ps').textContent = '@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:0;}'
-    + 'html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#fff;}'
-    + 'body{box-sizing:border-box;padding:7mm;}'
-    + 'img{display:block;width:100%;height:100%;object-fit:contain;-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
-  d.getElementById('p').src = im.src;   // 미리 불러둔 원본이라 바로 준비됨
-  f.contentWindow.focus();
-  f.contentWindow.print();
-}
-printFrame();
 </script>
 </body>
 </html>
