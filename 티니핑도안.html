@@ -8,7 +8,6 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #fff0f5; padding: 16px 14px 60px; }
-  body.modal-open { overflow: hidden; }
   h1 { text-align: center; color: #e91e8c; font-size: 1.6rem; margin-bottom: 6px; letter-spacing: 2px; }
   .count { text-align: center; color: #aaa; margin-bottom: 16px; font-size: 0.9rem; }
   .search-bar { display: flex; justify-content: center; margin-bottom: 24px; padding: 0 4px; }
@@ -22,17 +21,6 @@
   .card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(233,30,140,0.2); }
   .card:active { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(233,30,140,0.25); }
   .card img { width: 100%; height: 150px; object-fit: contain; background: #fafafa; padding: 6px; display: block; }
-  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 999; justify-content: center; align-items: center; flex-direction: column; gap: 14px; padding: 16px; }
-  .modal.open { display: flex; }
-  .modal-img-wrap { display: flex; justify-content: center; align-items: center; }
-  .modal-img-wrap img { max-width: min(92vw, 600px); max-height: 72vh; border-radius: 10px; box-shadow: 0 8px 40px rgba(0,0,0,0.5); display: block; }
-  .modal-footer { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
-  .modal-name { background: rgba(233,30,140,0.9); color: white; padding: 10px 20px; border-radius: 30px; font-size: 1rem; font-weight: 700; white-space: nowrap; }
-  .btn-print { background: white; color: #e91e8c; border: 2px solid #e91e8c; padding: 10px 20px; border-radius: 30px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s; min-height: 44px; -webkit-tap-highlight-color: transparent; }
-  a.btn-print { text-decoration: none; display: inline-flex; align-items: center; }
-  .ver { color: rgba(255,255,255,0.6); font-size: 0.75rem; width: 100%; text-align: center; }
-  .btn-print:hover { background: #e91e8c; color: white; }
-  .btn-print:active { background: #e91e8c; color: white; }
   .hidden { display: none !important; }
   .top-links { text-align: center; margin-bottom: 14px; }
   .top-links a { color: #c2185b; font-weight: 700; text-decoration: none; background: white; border: 2px solid #f8bbd0; border-radius: 30px; padding: 8px 16px; display: inline-block; }
@@ -58,6 +46,10 @@
     #print-area img { display: block; margin: 0 auto; width: auto; height: auto; max-width: 193mm; max-height: 278mm; break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #print-area.land img { max-width: 280mm; max-height: 190mm; }
   }
+  .card { position: relative; }
+  .card.picked { outline: 4px solid #e91e8c; outline-offset: -4px; }
+  .card.picked::after { content: '⏳'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.6); font-size: 2.6rem; }
+  .card.picked.ready::after { content: '🖨️'; font-size: 3.4rem; background: rgba(255,240,245,0.55); }
 </style>
 </head>
 <body>
@@ -70,16 +62,16 @@
   <div class="group" data-name="고고핑">
     <h2 class="group-title">고고핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/고고핑_1.webp', '고고핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/고고핑_1.webp', '고고핑')">
         <img src="티니핑도안/고고핑_1.webp" alt="고고핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/고고핑_2.webp', '고고핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/고고핑_2.webp', '고고핑')">
         <img src="티니핑도안/고고핑_2.webp" alt="고고핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/고고핑_3.webp', '고고핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/고고핑_3.webp', '고고핑')">
         <img src="티니핑도안/고고핑_3.webp" alt="고고핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/고고핑_4.webp', '고고핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/고고핑_4.webp', '고고핑')">
         <img src="티니핑도안/고고핑_4.webp" alt="고고핑" loading="lazy">
       </div>
     </div>
@@ -87,16 +79,16 @@
   <div class="group" data-name="고마핑">
     <h2 class="group-title">고마핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/고마핑_1.webp', '고마핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/고마핑_1.webp', '고마핑')">
         <img src="티니핑도안/고마핑_1.webp" alt="고마핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/고마핑_2.webp', '고마핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/고마핑_2.webp', '고마핑')">
         <img src="티니핑도안/고마핑_2.webp" alt="고마핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/고마핑_3.webp', '고마핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/고마핑_3.webp', '고마핑')">
         <img src="티니핑도안/고마핑_3.webp" alt="고마핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/고마핑_4.webp', '고마핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/고마핑_4.webp', '고마핑')">
         <img src="티니핑도안/고마핑_4.webp" alt="고마핑" loading="lazy">
       </div>
     </div>
@@ -104,28 +96,28 @@
   <div class="group" data-name="깡총핑">
     <h2 class="group-title">깡총핑 <span class="cnt">8</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/깡총핑_1.webp', '깡총핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깡총핑_1.webp', '깡총핑')">
         <img src="티니핑도안/깡총핑_1.webp" alt="깡총핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/깡총핑_2.webp', '깡총핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깡총핑_2.webp', '깡총핑')">
         <img src="티니핑도안/깡총핑_2.webp" alt="깡총핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/깡총핑_3.webp', '깡총핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깡총핑_3.webp', '깡총핑')">
         <img src="티니핑도안/깡총핑_3.webp" alt="깡총핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/깡총핑_4.webp', '깡총핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깡총핑_4.webp', '깡총핑')">
         <img src="티니핑도안/깡총핑_4.webp" alt="깡총핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/깡총핑_5.webp', '깡총핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깡총핑_5.webp', '깡총핑')">
         <img src="티니핑도안/깡총핑_5.webp" alt="깡총핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/깡총핑_6.webp', '깡총핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깡총핑_6.webp', '깡총핑')">
         <img src="티니핑도안/깡총핑_6.webp" alt="깡총핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/깡총핑_7.webp', '깡총핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깡총핑_7.webp', '깡총핑')">
         <img src="티니핑도안/깡총핑_7.webp" alt="깡총핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/깡총핑_8.webp', '깡총핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깡총핑_8.webp', '깡총핑')">
         <img src="티니핑도안/깡총핑_8.webp" alt="깡총핑" loading="lazy">
       </div>
     </div>
@@ -133,10 +125,10 @@
   <div class="group" data-name="깨굴핑">
     <h2 class="group-title">깨굴핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/깨굴핑_1.webp', '깨굴핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깨굴핑_1.webp', '깨굴핑')">
         <img src="티니핑도안/깨굴핑_1.webp" alt="깨굴핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/깨굴핑_2.webp', '깨굴핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/깨굴핑_2.webp', '깨굴핑')">
         <img src="티니핑도안/깨굴핑_2.webp" alt="깨굴핑" loading="lazy">
       </div>
     </div>
@@ -144,16 +136,16 @@
   <div class="group" data-name="꾸래핑">
     <h2 class="group-title">꾸래핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/꾸래핑_1.webp', '꾸래핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/꾸래핑_1.webp', '꾸래핑')">
         <img src="티니핑도안/꾸래핑_1.webp" alt="꾸래핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/꾸래핑_2.webp', '꾸래핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/꾸래핑_2.webp', '꾸래핑')">
         <img src="티니핑도안/꾸래핑_2.webp" alt="꾸래핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/꾸래핑_3.webp', '꾸래핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/꾸래핑_3.webp', '꾸래핑')">
         <img src="티니핑도안/꾸래핑_3.webp" alt="꾸래핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/꾸래핑_4.webp', '꾸래핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/꾸래핑_4.webp', '꾸래핑')">
         <img src="티니핑도안/꾸래핑_4.webp" alt="꾸래핑" loading="lazy">
       </div>
     </div>
@@ -161,16 +153,16 @@
   <div class="group" data-name="나그네핑">
     <h2 class="group-title">나그네핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/나그네핑_1.webp', '나그네핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나그네핑_1.webp', '나그네핑')">
         <img src="티니핑도안/나그네핑_1.webp" alt="나그네핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나그네핑_2.webp', '나그네핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나그네핑_2.webp', '나그네핑')">
         <img src="티니핑도안/나그네핑_2.webp" alt="나그네핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나그네핑_3.webp', '나그네핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나그네핑_3.webp', '나그네핑')">
         <img src="티니핑도안/나그네핑_3.webp" alt="나그네핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나그네핑_4.webp', '나그네핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나그네핑_4.webp', '나그네핑')">
         <img src="티니핑도안/나그네핑_4.webp" alt="나그네핑" loading="lazy">
       </div>
     </div>
@@ -178,16 +170,16 @@
   <div class="group" data-name="나나핑">
     <h2 class="group-title">나나핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/나나핑_1.webp', '나나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나나핑_1.webp', '나나핑')">
         <img src="티니핑도안/나나핑_1.webp" alt="나나핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나나핑_2.webp', '나나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나나핑_2.webp', '나나핑')">
         <img src="티니핑도안/나나핑_2.webp" alt="나나핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나나핑_3.webp', '나나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나나핑_3.webp', '나나핑')">
         <img src="티니핑도안/나나핑_3.webp" alt="나나핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나나핑_4.webp', '나나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나나핑_4.webp', '나나핑')">
         <img src="티니핑도안/나나핑_4.webp" alt="나나핑" loading="lazy">
       </div>
     </div>
@@ -195,16 +187,16 @@
   <div class="group" data-name="나눔핑">
     <h2 class="group-title">나눔핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/나눔핑_1.webp', '나눔핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나눔핑_1.webp', '나눔핑')">
         <img src="티니핑도안/나눔핑_1.webp" alt="나눔핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나눔핑_2.webp', '나눔핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나눔핑_2.webp', '나눔핑')">
         <img src="티니핑도안/나눔핑_2.webp" alt="나눔핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나눔핑_3.webp', '나눔핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나눔핑_3.webp', '나눔핑')">
         <img src="티니핑도안/나눔핑_3.webp" alt="나눔핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나눔핑_4.webp', '나눔핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나눔핑_4.webp', '나눔핑')">
         <img src="티니핑도안/나눔핑_4.webp" alt="나눔핑" loading="lazy">
       </div>
     </div>
@@ -212,10 +204,10 @@
   <div class="group" data-name="나비핑">
     <h2 class="group-title">나비핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/나비핑_1.webp', '나비핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나비핑_1.webp', '나비핑')">
         <img src="티니핑도안/나비핑_1.webp" alt="나비핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/나비핑_2.webp', '나비핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/나비핑_2.webp', '나비핑')">
         <img src="티니핑도안/나비핑_2.webp" alt="나비핑" loading="lazy">
       </div>
     </div>
@@ -223,10 +215,10 @@
   <div class="group" data-name="눈꽃핑">
     <h2 class="group-title">눈꽃핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/눈꽃핑-1.jpg', '눈꽃핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/눈꽃핑-1.jpg', '눈꽃핑')">
         <img src="티니핑도안/눈꽃핑-1.jpg" alt="눈꽃핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/눈꽃핑_4.webp', '눈꽃핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/눈꽃핑_4.webp', '눈꽃핑')">
         <img src="티니핑도안/눈꽃핑_4.webp" alt="눈꽃핑" loading="lazy">
       </div>
     </div>
@@ -234,16 +226,16 @@
   <div class="group" data-name="다롱핑">
     <h2 class="group-title">다롱핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/다롱핑_1.webp', '다롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/다롱핑_1.webp', '다롱핑')">
         <img src="티니핑도안/다롱핑_1.webp" alt="다롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/다롱핑_2.webp', '다롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/다롱핑_2.webp', '다롱핑')">
         <img src="티니핑도안/다롱핑_2.webp" alt="다롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/다롱핑_3.webp', '다롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/다롱핑_3.webp', '다롱핑')">
         <img src="티니핑도안/다롱핑_3.webp" alt="다롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/다롱핑_4.webp', '다롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/다롱핑_4.webp', '다롱핑')">
         <img src="티니핑도안/다롱핑_4.webp" alt="다롱핑" loading="lazy">
       </div>
     </div>
@@ -251,13 +243,13 @@
   <div class="group" data-name="다이아나핑">
     <h2 class="group-title">다이아나핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/다이아나핑_1.webp', '다이아나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/다이아나핑_1.webp', '다이아나핑')">
         <img src="티니핑도안/다이아나핑_1.webp" alt="다이아나핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/다이아나핑_2.webp', '다이아나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/다이아나핑_2.webp', '다이아나핑')">
         <img src="티니핑도안/다이아나핑_2.webp" alt="다이아나핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/다이아나핑_3.webp', '다이아나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/다이아나핑_3.webp', '다이아나핑')">
         <img src="티니핑도안/다이아나핑_3.webp" alt="다이아나핑" loading="lazy">
       </div>
     </div>
@@ -265,10 +257,10 @@
   <div class="group" data-name="달콤핑">
     <h2 class="group-title">달콤핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/달콤핑-1.jpg', '달콤핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/달콤핑-1.jpg', '달콤핑')">
         <img src="티니핑도안/달콤핑-1.jpg" alt="달콤핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/달콤핑_2.webp', '달콤핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/달콤핑_2.webp', '달콤핑')">
         <img src="티니핑도안/달콤핑_2.webp" alt="달콤핑" loading="lazy">
       </div>
     </div>
@@ -276,16 +268,16 @@
   <div class="group" data-name="댄스핑">
     <h2 class="group-title">댄스핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/댄스핑_1.webp', '댄스핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/댄스핑_1.webp', '댄스핑')">
         <img src="티니핑도안/댄스핑_1.webp" alt="댄스핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/댄스핑_2.webp', '댄스핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/댄스핑_2.webp', '댄스핑')">
         <img src="티니핑도안/댄스핑_2.webp" alt="댄스핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/댄스핑_3.webp', '댄스핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/댄스핑_3.webp', '댄스핑')">
         <img src="티니핑도안/댄스핑_3.webp" alt="댄스핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/댄스핑_4.webp', '댄스핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/댄스핑_4.webp', '댄스핑')">
         <img src="티니핑도안/댄스핑_4.webp" alt="댄스핑" loading="lazy">
       </div>
     </div>
@@ -293,16 +285,16 @@
   <div class="group" data-name="딩동핑">
     <h2 class="group-title">딩동핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/딩동핑_1.webp', '딩동핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/딩동핑_1.webp', '딩동핑')">
         <img src="티니핑도안/딩동핑_1.webp" alt="딩동핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/딩동핑_2.webp', '딩동핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/딩동핑_2.webp', '딩동핑')">
         <img src="티니핑도안/딩동핑_2.webp" alt="딩동핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/딩동핑_3.webp', '딩동핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/딩동핑_3.webp', '딩동핑')">
         <img src="티니핑도안/딩동핑_3.webp" alt="딩동핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/딩동핑_4.webp', '딩동핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/딩동핑_4.webp', '딩동핑')">
         <img src="티니핑도안/딩동핑_4.webp" alt="딩동핑" loading="lazy">
       </div>
     </div>
@@ -310,10 +302,10 @@
   <div class="group" data-name="또너핑">
     <h2 class="group-title">또너핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/또너핑-1.jpg', '또너핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/또너핑-1.jpg', '또너핑')">
         <img src="티니핑도안/또너핑-1.jpg" alt="또너핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/또너핑_2.webp', '또너핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/또너핑_2.webp', '또너핑')">
         <img src="티니핑도안/또너핑_2.webp" alt="또너핑" loading="lazy">
       </div>
     </div>
@@ -321,16 +313,16 @@
   <div class="group" data-name="라라핑">
     <h2 class="group-title">라라핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/라라핑_1.webp', '라라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/라라핑_1.webp', '라라핑')">
         <img src="티니핑도안/라라핑_1.webp" alt="라라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/라라핑_2.webp', '라라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/라라핑_2.webp', '라라핑')">
         <img src="티니핑도안/라라핑_2.webp" alt="라라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/라라핑_3.webp', '라라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/라라핑_3.webp', '라라핑')">
         <img src="티니핑도안/라라핑_3.webp" alt="라라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/라라핑_4.webp', '라라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/라라핑_4.webp', '라라핑')">
         <img src="티니핑도안/라라핑_4.webp" alt="라라핑" loading="lazy">
       </div>
     </div>
@@ -338,10 +330,10 @@
   <div class="group" data-name="로미 색칠공부">
     <h2 class="group-title">로미 색칠공부 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/로미_색칠공부_1.webp', '로미 색칠공부')">
+      <div class="card" onclick="pick(this, '티니핑도안/로미_색칠공부_1.webp', '로미 색칠공부')">
         <img src="티니핑도안/로미_색칠공부_1.webp" alt="로미 색칠공부" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/로미_색칠공부_2.webp', '로미 색칠공부')">
+      <div class="card" onclick="pick(this, '티니핑도안/로미_색칠공부_2.webp', '로미 색칠공부')">
         <img src="티니핑도안/로미_색칠공부_2.webp" alt="로미 색칠공부" loading="lazy">
       </div>
     </div>
@@ -349,10 +341,10 @@
   <div class="group" data-name="롤리핑">
     <h2 class="group-title">롤리핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/롤리핑-1.jpg', '롤리핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/롤리핑-1.jpg', '롤리핑')">
         <img src="티니핑도안/롤리핑-1.jpg" alt="롤리핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/롤리핑_2.webp', '롤리핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/롤리핑_2.webp', '롤리핑')">
         <img src="티니핑도안/롤리핑_2.webp" alt="롤리핑" loading="lazy">
       </div>
     </div>
@@ -360,13 +352,13 @@
   <div class="group" data-name="롱롱핑">
     <h2 class="group-title">롱롱핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/롱롱핑_1.webp', '롱롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/롱롱핑_1.webp', '롱롱핑')">
         <img src="티니핑도안/롱롱핑_1.webp" alt="롱롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/롱롱핑_2.webp', '롱롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/롱롱핑_2.webp', '롱롱핑')">
         <img src="티니핑도안/롱롱핑_2.webp" alt="롱롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/롱롱핑_3.webp', '롱롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/롱롱핑_3.webp', '롱롱핑')">
         <img src="티니핑도안/롱롱핑_3.webp" alt="롱롱핑" loading="lazy">
       </div>
     </div>
@@ -374,13 +366,13 @@
   <div class="group" data-name="루루핑">
     <h2 class="group-title">루루핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/루루핑_1.webp', '루루핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/루루핑_1.webp', '루루핑')">
         <img src="티니핑도안/루루핑_1.webp" alt="루루핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/루루핑_2.webp', '루루핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/루루핑_2.webp', '루루핑')">
         <img src="티니핑도안/루루핑_2.webp" alt="루루핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/루루핑_3.webp', '루루핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/루루핑_3.webp', '루루핑')">
         <img src="티니핑도안/루루핑_3.webp" alt="루루핑" loading="lazy">
       </div>
     </div>
@@ -388,10 +380,10 @@
   <div class="group" data-name="마카핑">
     <h2 class="group-title">마카핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/마카핑-1.jpg', '마카핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/마카핑-1.jpg', '마카핑')">
         <img src="티니핑도안/마카핑-1.jpg" alt="마카핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/마카핑_2.webp', '마카핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/마카핑_2.webp', '마카핑')">
         <img src="티니핑도안/마카핑_2.webp" alt="마카핑" loading="lazy">
       </div>
     </div>
@@ -399,10 +391,10 @@
   <div class="group" data-name="말랑핑">
     <h2 class="group-title">말랑핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/말랑핑.webp', '말랑핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/말랑핑.webp', '말랑핑')">
         <img src="티니핑도안/말랑핑.webp" alt="말랑핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/말랑핑_2.webp', '말랑핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/말랑핑_2.webp', '말랑핑')">
         <img src="티니핑도안/말랑핑_2.webp" alt="말랑핑" loading="lazy">
       </div>
     </div>
@@ -410,10 +402,10 @@
   <div class="group" data-name="머랭핑">
     <h2 class="group-title">머랭핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/머랭핑-1.jpg', '머랭핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/머랭핑-1.jpg', '머랭핑')">
         <img src="티니핑도안/머랭핑-1.jpg" alt="머랭핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/머랭핑_2.webp', '머랭핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/머랭핑_2.webp', '머랭핑')">
         <img src="티니핑도안/머랭핑_2.webp" alt="머랭핑" loading="lazy">
       </div>
     </div>
@@ -421,10 +413,10 @@
   <div class="group" data-name="멜로핑">
     <h2 class="group-title">멜로핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/멜로핑-1-1.jpg', '멜로핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/멜로핑-1-1.jpg', '멜로핑')">
         <img src="티니핑도안/멜로핑-1-1.jpg" alt="멜로핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/멜로핑_1.webp', '멜로핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/멜로핑_1.webp', '멜로핑')">
         <img src="티니핑도안/멜로핑_1.webp" alt="멜로핑" loading="lazy">
       </div>
     </div>
@@ -432,16 +424,16 @@
   <div class="group" data-name="몰래핑">
     <h2 class="group-title">몰래핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/몰래핑_1.webp', '몰래핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/몰래핑_1.webp', '몰래핑')">
         <img src="티니핑도안/몰래핑_1.webp" alt="몰래핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/몰래핑_2.webp', '몰래핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/몰래핑_2.webp', '몰래핑')">
         <img src="티니핑도안/몰래핑_2.webp" alt="몰래핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/몰래핑_3.webp', '몰래핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/몰래핑_3.webp', '몰래핑')">
         <img src="티니핑도안/몰래핑_3.webp" alt="몰래핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/몰래핑_4.webp', '몰래핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/몰래핑_4.webp', '몰래핑')">
         <img src="티니핑도안/몰래핑_4.webp" alt="몰래핑" loading="lazy">
       </div>
     </div>
@@ -449,16 +441,16 @@
   <div class="group" data-name="바로핑">
     <h2 class="group-title">바로핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/바로핑_1.webp', '바로핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/바로핑_1.webp', '바로핑')">
         <img src="티니핑도안/바로핑_1.webp" alt="바로핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/바로핑_2.webp', '바로핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/바로핑_2.webp', '바로핑')">
         <img src="티니핑도안/바로핑_2.webp" alt="바로핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/바로핑_3.webp', '바로핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/바로핑_3.webp', '바로핑')">
         <img src="티니핑도안/바로핑_3.webp" alt="바로핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/바로핑_4.webp', '바로핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/바로핑_4.webp', '바로핑')">
         <img src="티니핑도안/바로핑_4.webp" alt="바로핑" loading="lazy">
       </div>
     </div>
@@ -466,13 +458,13 @@
   <div class="group" data-name="빛나핑">
     <h2 class="group-title">빛나핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/빛나핑_1.webp', '빛나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/빛나핑_1.webp', '빛나핑')">
         <img src="티니핑도안/빛나핑_1.webp" alt="빛나핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/빛나핑_2.webp', '빛나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/빛나핑_2.webp', '빛나핑')">
         <img src="티니핑도안/빛나핑_2.webp" alt="빛나핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/빛나핑_3.webp', '빛나핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/빛나핑_3.webp', '빛나핑')">
         <img src="티니핑도안/빛나핑_3.webp" alt="빛나핑" loading="lazy">
       </div>
     </div>
@@ -480,13 +472,13 @@
   <div class="group" data-name="빤짝핑">
     <h2 class="group-title">빤짝핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/빤짝핑.webp', '빤짝핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/빤짝핑.webp', '빤짝핑')">
         <img src="티니핑도안/빤짝핑.webp" alt="빤짝핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/빤짝핑_2.webp', '빤짝핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/빤짝핑_2.webp', '빤짝핑')">
         <img src="티니핑도안/빤짝핑_2.webp" alt="빤짝핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/빤짝핑_3.webp', '빤짝핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/빤짝핑_3.webp', '빤짝핑')">
         <img src="티니핑도안/빤짝핑_3.webp" alt="빤짝핑" loading="lazy">
       </div>
     </div>
@@ -494,22 +486,22 @@
   <div class="group" data-name="뽀니핑">
     <h2 class="group-title">뽀니핑 <span class="cnt">6</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/뽀니핑_1.webp', '뽀니핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀니핑_1.webp', '뽀니핑')">
         <img src="티니핑도안/뽀니핑_1.webp" alt="뽀니핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀니핑_2.webp', '뽀니핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀니핑_2.webp', '뽀니핑')">
         <img src="티니핑도안/뽀니핑_2.webp" alt="뽀니핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀니핑_3.webp', '뽀니핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀니핑_3.webp', '뽀니핑')">
         <img src="티니핑도안/뽀니핑_3.webp" alt="뽀니핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀니핑_4.webp', '뽀니핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀니핑_4.webp', '뽀니핑')">
         <img src="티니핑도안/뽀니핑_4.webp" alt="뽀니핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀니핑_5.webp', '뽀니핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀니핑_5.webp', '뽀니핑')">
         <img src="티니핑도안/뽀니핑_5.webp" alt="뽀니핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀니핑_6.webp', '뽀니핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀니핑_6.webp', '뽀니핑')">
         <img src="티니핑도안/뽀니핑_6.webp" alt="뽀니핑" loading="lazy">
       </div>
     </div>
@@ -517,13 +509,13 @@
   <div class="group" data-name="뽀득핑">
     <h2 class="group-title">뽀득핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/뽀득핑.jpg', '뽀득핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀득핑.jpg', '뽀득핑')">
         <img src="티니핑도안/뽀득핑.jpg" alt="뽀득핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀득핑_1.webp', '뽀득핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀득핑_1.webp', '뽀득핑')">
         <img src="티니핑도안/뽀득핑_1.webp" alt="뽀득핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀득핑_2.webp', '뽀득핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀득핑_2.webp', '뽀득핑')">
         <img src="티니핑도안/뽀득핑_2.webp" alt="뽀득핑" loading="lazy">
       </div>
     </div>
@@ -531,13 +523,13 @@
   <div class="group" data-name="뽀뽀핑">
     <h2 class="group-title">뽀뽀핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/뽀뽀핑_1.webp', '뽀뽀핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀뽀핑_1.webp', '뽀뽀핑')">
         <img src="티니핑도안/뽀뽀핑_1.webp" alt="뽀뽀핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀뽀핑_2.webp', '뽀뽀핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀뽀핑_2.webp', '뽀뽀핑')">
         <img src="티니핑도안/뽀뽀핑_2.webp" alt="뽀뽀핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀뽀핑_3.webp', '뽀뽀핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀뽀핑_3.webp', '뽀뽀핑')">
         <img src="티니핑도안/뽀뽀핑_3.webp" alt="뽀뽀핑" loading="lazy">
       </div>
     </div>
@@ -545,16 +537,16 @@
   <div class="group" data-name="뽀송핑">
     <h2 class="group-title">뽀송핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/뽀송핑_2.webp', '뽀송핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀송핑_2.webp', '뽀송핑')">
         <img src="티니핑도안/뽀송핑_2.webp" alt="뽀송핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀송핑_3.webp', '뽀송핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀송핑_3.webp', '뽀송핑')">
         <img src="티니핑도안/뽀송핑_3.webp" alt="뽀송핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀송핑_4.webp', '뽀송핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀송핑_4.webp', '뽀송핑')">
         <img src="티니핑도안/뽀송핑_4.webp" alt="뽀송핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뽀송핑_5.webp', '뽀송핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뽀송핑_5.webp', '뽀송핑')">
         <img src="티니핑도안/뽀송핑_5.webp" alt="뽀송핑" loading="lazy">
       </div>
     </div>
@@ -562,10 +554,10 @@
   <div class="group" data-name="뿌뿌핑">
     <h2 class="group-title">뿌뿌핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/뿌뿌핑-1-1.jpg', '뿌뿌핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뿌뿌핑-1-1.jpg', '뿌뿌핑')">
         <img src="티니핑도안/뿌뿌핑-1-1.jpg" alt="뿌뿌핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뿌뿌핑_2.webp', '뿌뿌핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뿌뿌핑_2.webp', '뿌뿌핑')">
         <img src="티니핑도안/뿌뿌핑_2.webp" alt="뿌뿌핑" loading="lazy">
       </div>
     </div>
@@ -573,16 +565,16 @@
   <div class="group" data-name="뿌쵸핑">
     <h2 class="group-title">뿌쵸핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/뿌쵸핑_1.webp', '뿌쵸핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뿌쵸핑_1.webp', '뿌쵸핑')">
         <img src="티니핑도안/뿌쵸핑_1.webp" alt="뿌쵸핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뿌쵸핑_2.webp', '뿌쵸핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뿌쵸핑_2.webp', '뿌쵸핑')">
         <img src="티니핑도안/뿌쵸핑_2.webp" alt="뿌쵸핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뿌쵸핑_3.webp', '뿌쵸핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뿌쵸핑_3.webp', '뿌쵸핑')">
         <img src="티니핑도안/뿌쵸핑_3.webp" alt="뿌쵸핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/뿌쵸핑_4.webp', '뿌쵸핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/뿌쵸핑_4.webp', '뿌쵸핑')">
         <img src="티니핑도안/뿌쵸핑_4.webp" alt="뿌쵸핑" loading="lazy">
       </div>
     </div>
@@ -590,25 +582,25 @@
   <div class="group" data-name="사뿐핑">
     <h2 class="group-title">사뿐핑 <span class="cnt">7</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/사뿐핑_1.webp', '사뿐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/사뿐핑_1.webp', '사뿐핑')">
         <img src="티니핑도안/사뿐핑_1.webp" alt="사뿐핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/사뿐핑_2.webp', '사뿐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/사뿐핑_2.webp', '사뿐핑')">
         <img src="티니핑도안/사뿐핑_2.webp" alt="사뿐핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/사뿐핑_3.webp', '사뿐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/사뿐핑_3.webp', '사뿐핑')">
         <img src="티니핑도안/사뿐핑_3.webp" alt="사뿐핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/사뿐핑_4.webp', '사뿐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/사뿐핑_4.webp', '사뿐핑')">
         <img src="티니핑도안/사뿐핑_4.webp" alt="사뿐핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/사뿐핑_5.webp', '사뿐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/사뿐핑_5.webp', '사뿐핑')">
         <img src="티니핑도안/사뿐핑_5.webp" alt="사뿐핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/사뿐핑_6.webp', '사뿐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/사뿐핑_6.webp', '사뿐핑')">
         <img src="티니핑도안/사뿐핑_6.webp" alt="사뿐핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/사뿐핑_7.webp', '사뿐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/사뿐핑_7.webp', '사뿐핑')">
         <img src="티니핑도안/사뿐핑_7.webp" alt="사뿐핑" loading="lazy">
       </div>
     </div>
@@ -616,10 +608,10 @@
   <div class="group" data-name="새콤핑">
     <h2 class="group-title">새콤핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/새콤핑-1.jpg', '새콤핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/새콤핑-1.jpg', '새콤핑')">
         <img src="티니핑도안/새콤핑-1.jpg" alt="새콤핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/새콤핑.webp', '새콤핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/새콤핑.webp', '새콤핑')">
         <img src="티니핑도안/새콤핑.webp" alt="새콤핑" loading="lazy">
       </div>
     </div>
@@ -627,10 +619,10 @@
   <div class="group" data-name="샌드핑">
     <h2 class="group-title">샌드핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/샌드핑-1-1.jpg', '샌드핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/샌드핑-1-1.jpg', '샌드핑')">
         <img src="티니핑도안/샌드핑-1-1.jpg" alt="샌드핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/샌드핑_2.webp', '샌드핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/샌드핑_2.webp', '샌드핑')">
         <img src="티니핑도안/샌드핑_2.webp" alt="샌드핑" loading="lazy">
       </div>
     </div>
@@ -638,10 +630,10 @@
   <div class="group" data-name="샤를핑">
     <h2 class="group-title">샤를핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/샤를핑_1.webp', '샤를핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/샤를핑_1.webp', '샤를핑')">
         <img src="티니핑도안/샤를핑_1.webp" alt="샤를핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/샤를핑_2.webp', '샤를핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/샤를핑_2.webp', '샤를핑')">
         <img src="티니핑도안/샤를핑_2.webp" alt="샤를핑" loading="lazy">
       </div>
     </div>
@@ -649,10 +641,10 @@
   <div class="group" data-name="샤샤핑">
     <h2 class="group-title">샤샤핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/샤샤핑.webp', '샤샤핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/샤샤핑.webp', '샤샤핑')">
         <img src="티니핑도안/샤샤핑.webp" alt="샤샤핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/샤샤핑_2.webp', '샤샤핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/샤샤핑_2.webp', '샤샤핑')">
         <img src="티니핑도안/샤샤핑_2.webp" alt="샤샤핑" loading="lazy">
       </div>
     </div>
@@ -660,16 +652,16 @@
   <div class="group" data-name="솔찌핑">
     <h2 class="group-title">솔찌핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/솔찌핑_1.webp', '솔찌핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/솔찌핑_1.webp', '솔찌핑')">
         <img src="티니핑도안/솔찌핑_1.webp" alt="솔찌핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/솔찌핑_2.webp', '솔찌핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/솔찌핑_2.webp', '솔찌핑')">
         <img src="티니핑도안/솔찌핑_2.webp" alt="솔찌핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/솔찌핑_3.webp', '솔찌핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/솔찌핑_3.webp', '솔찌핑')">
         <img src="티니핑도안/솔찌핑_3.webp" alt="솔찌핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/솔찌핑_4.webp', '솔찌핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/솔찌핑_4.webp', '솔찌핑')">
         <img src="티니핑도안/솔찌핑_4.webp" alt="솔찌핑" loading="lazy">
       </div>
     </div>
@@ -677,13 +669,13 @@
   <div class="group" data-name="슈슈핑">
     <h2 class="group-title">슈슈핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/슈슈핑_1.webp', '슈슈핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/슈슈핑_1.webp', '슈슈핑')">
         <img src="티니핑도안/슈슈핑_1.webp" alt="슈슈핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/슈슈핑_2.webp', '슈슈핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/슈슈핑_2.webp', '슈슈핑')">
         <img src="티니핑도안/슈슈핑_2.webp" alt="슈슈핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/슈슈핑_3.webp', '슈슈핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/슈슈핑_3.webp', '슈슈핑')">
         <img src="티니핑도안/슈슈핑_3.webp" alt="슈슈핑" loading="lazy">
       </div>
     </div>
@@ -691,10 +683,10 @@
   <div class="group" data-name="스노우핑">
     <h2 class="group-title">스노우핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/스노우핑_1.webp', '스노우핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/스노우핑_1.webp', '스노우핑')">
         <img src="티니핑도안/스노우핑_1.webp" alt="스노우핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/스노우핑_2.webp', '스노우핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/스노우핑_2.webp', '스노우핑')">
         <img src="티니핑도안/스노우핑_2.webp" alt="스노우핑" loading="lazy">
       </div>
     </div>
@@ -702,13 +694,13 @@
   <div class="group" data-name="실크핑">
     <h2 class="group-title">실크핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/실크핑_1.webp', '실크핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/실크핑_1.webp', '실크핑')">
         <img src="티니핑도안/실크핑_1.webp" alt="실크핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/실크핑_2.webp', '실크핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/실크핑_2.webp', '실크핑')">
         <img src="티니핑도안/실크핑_2.webp" alt="실크핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/실크핑_3.webp', '실크핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/실크핑_3.webp', '실크핑')">
         <img src="티니핑도안/실크핑_3.webp" alt="실크핑" loading="lazy">
       </div>
     </div>
@@ -716,16 +708,16 @@
   <div class="group" data-name="아롱핑">
     <h2 class="group-title">아롱핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/아롱핑_1.webp', '아롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아롱핑_1.webp', '아롱핑')">
         <img src="티니핑도안/아롱핑_1.webp" alt="아롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아롱핑_2.webp', '아롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아롱핑_2.webp', '아롱핑')">
         <img src="티니핑도안/아롱핑_2.webp" alt="아롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아롱핑_3.webp', '아롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아롱핑_3.webp', '아롱핑')">
         <img src="티니핑도안/아롱핑_3.webp" alt="아롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아롱핑_4.webp', '아롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아롱핑_4.webp', '아롱핑')">
         <img src="티니핑도안/아롱핑_4.webp" alt="아롱핑" loading="lazy">
       </div>
     </div>
@@ -733,22 +725,22 @@
   <div class="group" data-name="아름핑">
     <h2 class="group-title">아름핑 <span class="cnt">6</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/아름핑_1.webp', '아름핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아름핑_1.webp', '아름핑')">
         <img src="티니핑도안/아름핑_1.webp" alt="아름핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아름핑_2.webp', '아름핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아름핑_2.webp', '아름핑')">
         <img src="티니핑도안/아름핑_2.webp" alt="아름핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아름핑_3.webp', '아름핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아름핑_3.webp', '아름핑')">
         <img src="티니핑도안/아름핑_3.webp" alt="아름핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아름핑_4.webp', '아름핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아름핑_4.webp', '아름핑')">
         <img src="티니핑도안/아름핑_4.webp" alt="아름핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아름핑_5.webp', '아름핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아름핑_5.webp', '아름핑')">
         <img src="티니핑도안/아름핑_5.webp" alt="아름핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아름핑_6.webp', '아름핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아름핑_6.webp', '아름핑')">
         <img src="티니핑도안/아름핑_6.webp" alt="아름핑" loading="lazy">
       </div>
     </div>
@@ -756,16 +748,16 @@
   <div class="group" data-name="아자핑">
     <h2 class="group-title">아자핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/아자핑_1.webp', '아자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아자핑_1.webp', '아자핑')">
         <img src="티니핑도안/아자핑_1.webp" alt="아자핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아자핑_2.webp', '아자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아자핑_2.webp', '아자핑')">
         <img src="티니핑도안/아자핑_2.webp" alt="아자핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아자핑_3.webp', '아자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아자핑_3.webp', '아자핑')">
         <img src="티니핑도안/아자핑_3.webp" alt="아자핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/아자핑_4.webp', '아자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/아자핑_4.webp', '아자핑')">
         <img src="티니핑도안/아자핑_4.webp" alt="아자핑" loading="lazy">
       </div>
     </div>
@@ -773,13 +765,13 @@
   <div class="group" data-name="야옹핑">
     <h2 class="group-title">야옹핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/야옹핑_1.webp', '야옹핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/야옹핑_1.webp', '야옹핑')">
         <img src="티니핑도안/야옹핑_1.webp" alt="야옹핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/야옹핑_2.webp', '야옹핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/야옹핑_2.webp', '야옹핑')">
         <img src="티니핑도안/야옹핑_2.webp" alt="야옹핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/야옹핑_3.webp', '야옹핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/야옹핑_3.webp', '야옹핑')">
         <img src="티니핑도안/야옹핑_3.webp" alt="야옹핑" loading="lazy">
       </div>
     </div>
@@ -787,13 +779,13 @@
   <div class="group" data-name="여우핑">
     <h2 class="group-title">여우핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/여우핑_1.webp', '여우핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/여우핑_1.webp', '여우핑')">
         <img src="티니핑도안/여우핑_1.webp" alt="여우핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/여우핑_2.webp', '여우핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/여우핑_2.webp', '여우핑')">
         <img src="티니핑도안/여우핑_2.webp" alt="여우핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/여우핑_3.webp', '여우핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/여우핑_3.webp', '여우핑')">
         <img src="티니핑도안/여우핑_3.webp" alt="여우핑" loading="lazy">
       </div>
     </div>
@@ -801,19 +793,19 @@
   <div class="group" data-name="오로라핑">
     <h2 class="group-title">오로라핑 <span class="cnt">5</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/오로라핑_1.webp', '오로라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/오로라핑_1.webp', '오로라핑')">
         <img src="티니핑도안/오로라핑_1.webp" alt="오로라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/오로라핑_2.webp', '오로라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/오로라핑_2.webp', '오로라핑')">
         <img src="티니핑도안/오로라핑_2.webp" alt="오로라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/오로라핑_3.webp', '오로라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/오로라핑_3.webp', '오로라핑')">
         <img src="티니핑도안/오로라핑_3.webp" alt="오로라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/오로라핑_4.webp', '오로라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/오로라핑_4.webp', '오로라핑')">
         <img src="티니핑도안/오로라핑_4.webp" alt="오로라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/오로라핑_5.webp', '오로라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/오로라핑_5.webp', '오로라핑')">
         <img src="티니핑도안/오로라핑_5.webp" alt="오로라핑" loading="lazy">
       </div>
     </div>
@@ -821,7 +813,7 @@
   <div class="group" data-name="와플핑">
     <h2 class="group-title">와플핑 <span class="cnt">1</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/와플핑-1.jpg', '와플핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/와플핑-1.jpg', '와플핑')">
         <img src="티니핑도안/와플핑-1.jpg" alt="와플핑" loading="lazy">
       </div>
     </div>
@@ -829,22 +821,22 @@
   <div class="group" data-name="왕자핑">
     <h2 class="group-title">왕자핑 <span class="cnt">6</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/왕자핑_1.webp', '왕자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/왕자핑_1.webp', '왕자핑')">
         <img src="티니핑도안/왕자핑_1.webp" alt="왕자핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/왕자핑_2.webp', '왕자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/왕자핑_2.webp', '왕자핑')">
         <img src="티니핑도안/왕자핑_2.webp" alt="왕자핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/왕자핑_3.webp', '왕자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/왕자핑_3.webp', '왕자핑')">
         <img src="티니핑도안/왕자핑_3.webp" alt="왕자핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/왕자핑_4.webp', '왕자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/왕자핑_4.webp', '왕자핑')">
         <img src="티니핑도안/왕자핑_4.webp" alt="왕자핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/왕자핑_5.webp', '왕자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/왕자핑_5.webp', '왕자핑')">
         <img src="티니핑도안/왕자핑_5.webp" alt="왕자핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/왕자핑_6.webp', '왕자핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/왕자핑_6.webp', '왕자핑')">
         <img src="티니핑도안/왕자핑_6.webp" alt="왕자핑" loading="lazy">
       </div>
     </div>
@@ -852,10 +844,10 @@
   <div class="group" data-name="요거핑">
     <h2 class="group-title">요거핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/요거핑-1.jpg', '요거핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/요거핑-1.jpg', '요거핑')">
         <img src="티니핑도안/요거핑-1.jpg" alt="요거핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/요거핑_2.webp', '요거핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/요거핑_2.webp', '요거핑')">
         <img src="티니핑도안/요거핑_2.webp" alt="요거핑" loading="lazy">
       </div>
     </div>
@@ -863,10 +855,10 @@
   <div class="group" data-name="유리핑">
     <h2 class="group-title">유리핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/유리핑_1.webp', '유리핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/유리핑_1.webp', '유리핑')">
         <img src="티니핑도안/유리핑_1.webp" alt="유리핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/유리핑_2.webp', '유리핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/유리핑_2.webp', '유리핑')">
         <img src="티니핑도안/유리핑_2.webp" alt="유리핑" loading="lazy">
       </div>
     </div>
@@ -874,13 +866,13 @@
   <div class="group" data-name="이슬핑">
     <h2 class="group-title">이슬핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/이슬핑_1.webp', '이슬핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/이슬핑_1.webp', '이슬핑')">
         <img src="티니핑도안/이슬핑_1.webp" alt="이슬핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/이슬핑_2.webp', '이슬핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/이슬핑_2.webp', '이슬핑')">
         <img src="티니핑도안/이슬핑_2.webp" alt="이슬핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/이슬핑_3.webp', '이슬핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/이슬핑_3.webp', '이슬핑')">
         <img src="티니핑도안/이슬핑_3.webp" alt="이슬핑" loading="lazy">
       </div>
     </div>
@@ -888,13 +880,13 @@
   <div class="group" data-name="이클립스핑">
     <h2 class="group-title">이클립스핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/이클립스핑_1.webp', '이클립스핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/이클립스핑_1.webp', '이클립스핑')">
         <img src="티니핑도안/이클립스핑_1.webp" alt="이클립스핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/이클립스핑_2.webp', '이클립스핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/이클립스핑_2.webp', '이클립스핑')">
         <img src="티니핑도안/이클립스핑_2.webp" alt="이클립스핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/이클립스핑_3.webp', '이클립스핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/이클립스핑_3.webp', '이클립스핑')">
         <img src="티니핑도안/이클립스핑_3.webp" alt="이클립스핑" loading="lazy">
       </div>
     </div>
@@ -902,10 +894,10 @@
   <div class="group" data-name="젠틀핑">
     <h2 class="group-title">젠틀핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/젠틀핑_1.webp', '젠틀핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/젠틀핑_1.webp', '젠틀핑')">
         <img src="티니핑도안/젠틀핑_1.webp" alt="젠틀핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/젠틀핑_2.webp', '젠틀핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/젠틀핑_2.webp', '젠틀핑')">
         <img src="티니핑도안/젠틀핑_2.webp" alt="젠틀핑" loading="lazy">
       </div>
     </div>
@@ -913,13 +905,13 @@
   <div class="group" data-name="쪼꼬핑">
     <h2 class="group-title">쪼꼬핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/쪼꼬핑-1.jpg', '쪼꼬핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/쪼꼬핑-1.jpg', '쪼꼬핑')">
         <img src="티니핑도안/쪼꼬핑-1.jpg" alt="쪼꼬핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/쪼꼬핑_1.webp', '쪼꼬핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/쪼꼬핑_1.webp', '쪼꼬핑')">
         <img src="티니핑도안/쪼꼬핑_1.webp" alt="쪼꼬핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/쪼꼬핑_2.webp', '쪼꼬핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/쪼꼬핑_2.webp', '쪼꼬핑')">
         <img src="티니핑도안/쪼꼬핑_2.webp" alt="쪼꼬핑" loading="lazy">
       </div>
     </div>
@@ -927,16 +919,16 @@
   <div class="group" data-name="차차핑">
     <h2 class="group-title">차차핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/차차핑_1.webp', '차차핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/차차핑_1.webp', '차차핑')">
         <img src="티니핑도안/차차핑_1.webp" alt="차차핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/차차핑_2.webp', '차차핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/차차핑_2.webp', '차차핑')">
         <img src="티니핑도안/차차핑_2.webp" alt="차차핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/차차핑_3.webp', '차차핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/차차핑_3.webp', '차차핑')">
         <img src="티니핑도안/차차핑_3.webp" alt="차차핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/차차핑_4.webp', '차차핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/차차핑_4.webp', '차차핑')">
         <img src="티니핑도안/차차핑_4.webp" alt="차차핑" loading="lazy">
       </div>
     </div>
@@ -944,13 +936,13 @@
   <div class="group" data-name="초롱핑">
     <h2 class="group-title">초롱핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/초롱핑.webp', '초롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/초롱핑.webp', '초롱핑')">
         <img src="티니핑도안/초롱핑.webp" alt="초롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/초롱핑_2.webp', '초롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/초롱핑_2.webp', '초롱핑')">
         <img src="티니핑도안/초롱핑_2.webp" alt="초롱핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/초롱핑_3.webp', '초롱핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/초롱핑_3.webp', '초롱핑')">
         <img src="티니핑도안/초롱핑_3.webp" alt="초롱핑" loading="lazy">
       </div>
     </div>
@@ -958,10 +950,10 @@
   <div class="group" data-name="캐치티니핑 목록">
     <h2 class="group-title">캐치티니핑 목록 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/캐치티니핑_목록_1.webp', '캐치티니핑 목록')">
+      <div class="card" onclick="pick(this, '티니핑도안/캐치티니핑_목록_1.webp', '캐치티니핑 목록')">
         <img src="티니핑도안/캐치티니핑_목록_1.webp" alt="캐치티니핑 목록" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/캐치티니핑_목록_2.webp', '캐치티니핑 목록')">
+      <div class="card" onclick="pick(this, '티니핑도안/캐치티니핑_목록_2.webp', '캐치티니핑 목록')">
         <img src="티니핑도안/캐치티니핑_목록_2.webp" alt="캐치티니핑 목록" loading="lazy">
       </div>
     </div>
@@ -969,10 +961,10 @@
   <div class="group" data-name="캔디핑">
     <h2 class="group-title">캔디핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/캔디핑-1.jpg', '캔디핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/캔디핑-1.jpg', '캔디핑')">
         <img src="티니핑도안/캔디핑-1.jpg" alt="캔디핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/캔디핑_2.webp', '캔디핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/캔디핑_2.webp', '캔디핑')">
         <img src="티니핑도안/캔디핑_2.webp" alt="캔디핑" loading="lazy">
       </div>
     </div>
@@ -980,10 +972,10 @@
   <div class="group" data-name="커핑머핑">
     <h2 class="group-title">커핑머핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/커핑머핑-1.jpg', '커핑머핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/커핑머핑-1.jpg', '커핑머핑')">
         <img src="티니핑도안/커핑머핑-1.jpg" alt="커핑머핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/커핑머핑_2.webp', '커핑머핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/커핑머핑_2.webp', '커핑머핑')">
         <img src="티니핑도안/커핑머핑_2.webp" alt="커핑머핑" loading="lazy">
       </div>
     </div>
@@ -991,13 +983,13 @@
   <div class="group" data-name="쿨쿨핑">
     <h2 class="group-title">쿨쿨핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/쿨쿨핑_1.webp', '쿨쿨핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/쿨쿨핑_1.webp', '쿨쿨핑')">
         <img src="티니핑도안/쿨쿨핑_1.webp" alt="쿨쿨핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/쿨쿨핑_2.webp', '쿨쿨핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/쿨쿨핑_2.webp', '쿨쿨핑')">
         <img src="티니핑도안/쿨쿨핑_2.webp" alt="쿨쿨핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/쿨쿨핑_3.webp', '쿨쿨핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/쿨쿨핑_3.webp', '쿨쿨핑')">
         <img src="티니핑도안/쿨쿨핑_3.webp" alt="쿨쿨핑" loading="lazy">
       </div>
     </div>
@@ -1005,13 +997,13 @@
   <div class="group" data-name="큐핑">
     <h2 class="group-title">큐핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/큐핑.webp', '큐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/큐핑.webp', '큐핑')">
         <img src="티니핑도안/큐핑.webp" alt="큐핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/큐핑_1.webp', '큐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/큐핑_1.webp', '큐핑')">
         <img src="티니핑도안/큐핑_1.webp" alt="큐핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/큐핑_2.webp', '큐핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/큐핑_2.webp', '큐핑')">
         <img src="티니핑도안/큐핑_2.webp" alt="큐핑" loading="lazy">
       </div>
     </div>
@@ -1019,7 +1011,7 @@
   <div class="group" data-name="트롯핑">
     <h2 class="group-title">트롯핑 <span class="cnt">1</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/트롯핑.webp', '트롯핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/트롯핑.webp', '트롯핑')">
         <img src="티니핑도안/트롯핑.webp" alt="트롯핑" loading="lazy">
       </div>
     </div>
@@ -1027,7 +1019,7 @@
   <div class="group" data-name="티니핑 컬러링북">
     <h2 class="group-title">티니핑 컬러링북 <span class="cnt">1</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/티니핑_컬러링북.webp', '티니핑 컬러링북')">
+      <div class="card" onclick="pick(this, '티니핑도안/티니핑_컬러링북.webp', '티니핑 컬러링북')">
         <img src="티니핑도안/티니핑_컬러링북.webp" alt="티니핑 컬러링북" loading="lazy">
       </div>
     </div>
@@ -1035,16 +1027,16 @@
   <div class="group" data-name="포실핑">
     <h2 class="group-title">포실핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/포실핑_1.webp', '포실핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/포실핑_1.webp', '포실핑')">
         <img src="티니핑도안/포실핑_1.webp" alt="포실핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/포실핑_2.webp', '포실핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/포실핑_2.webp', '포실핑')">
         <img src="티니핑도안/포실핑_2.webp" alt="포실핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/포실핑_3.webp', '포실핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/포실핑_3.webp', '포실핑')">
         <img src="티니핑도안/포실핑_3.webp" alt="포실핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/포실핑_4.webp', '포실핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/포실핑_4.webp', '포실핑')">
         <img src="티니핑도안/포실핑_4.webp" alt="포실핑" loading="lazy">
       </div>
     </div>
@@ -1052,16 +1044,16 @@
   <div class="group" data-name="퐁당핑">
     <h2 class="group-title">퐁당핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/퐁당핑_1.webp', '퐁당핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/퐁당핑_1.webp', '퐁당핑')">
         <img src="티니핑도안/퐁당핑_1.webp" alt="퐁당핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/퐁당핑_2.webp', '퐁당핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/퐁당핑_2.webp', '퐁당핑')">
         <img src="티니핑도안/퐁당핑_2.webp" alt="퐁당핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/퐁당핑_3.webp', '퐁당핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/퐁당핑_3.webp', '퐁당핑')">
         <img src="티니핑도안/퐁당핑_3.webp" alt="퐁당핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/퐁당핑_4.webp', '퐁당핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/퐁당핑_4.webp', '퐁당핑')">
         <img src="티니핑도안/퐁당핑_4.webp" alt="퐁당핑" loading="lazy">
       </div>
     </div>
@@ -1069,10 +1061,10 @@
   <div class="group" data-name="푸딩핑">
     <h2 class="group-title">푸딩핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/푸딩핑-1.jpg', '푸딩핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/푸딩핑-1.jpg', '푸딩핑')">
         <img src="티니핑도안/푸딩핑-1.jpg" alt="푸딩핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/푸딩핑_2.webp', '푸딩핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/푸딩핑_2.webp', '푸딩핑')">
         <img src="티니핑도안/푸딩핑_2.webp" alt="푸딩핑" loading="lazy">
       </div>
     </div>
@@ -1080,121 +1072,121 @@
   <div class="group" data-name="하츄핑">
     <h2 class="group-title">하츄핑 <span class="cnt">39</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_1.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_1.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_1.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_10.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_10.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_10.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_11.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_11.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_11.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_12.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_12.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_12.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_13.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_13.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_13.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_14.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_14.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_14.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_15.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_15.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_15.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_16.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_16.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_16.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_17.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_17.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_17.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_18.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_18.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_18.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_19.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_19.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_19.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_2.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_2.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_2.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_20.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_20.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_20.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_21.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_21.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_21.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_22.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_22.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_22.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_23.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_23.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_23.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_24.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_24.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_24.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_25.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_25.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_25.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_26.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_26.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_26.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_27.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_27.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_27.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_28.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_28.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_28.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_29.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_29.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_29.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_3.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_3.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_3.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_30.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_30.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_30.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_31.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_31.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_31.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_32.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_32.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_32.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_33.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_33.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_33.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_39.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_39.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_39.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_4.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_4.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_4.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_40.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_40.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_40.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_42.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_42.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_42.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_46.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_46.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_46.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_47.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_47.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_47.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_48.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_48.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_48.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_5.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_5.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_5.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_6.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_6.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_6.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_7.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_7.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_7.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_8.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_8.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_8.webp" alt="하츄핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/하츄핑_9.webp', '하츄핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/하츄핑_9.webp', '하츄핑')">
         <img src="티니핑도안/하츄핑_9.webp" alt="하츄핑" loading="lazy">
       </div>
     </div>
@@ -1202,16 +1194,16 @@
   <div class="group" data-name="함께핑">
     <h2 class="group-title">함께핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/함께핑_1.webp', '함께핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/함께핑_1.webp', '함께핑')">
         <img src="티니핑도안/함께핑_1.webp" alt="함께핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/함께핑_2.webp', '함께핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/함께핑_2.webp', '함께핑')">
         <img src="티니핑도안/함께핑_2.webp" alt="함께핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/함께핑_3.webp', '함께핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/함께핑_3.webp', '함께핑')">
         <img src="티니핑도안/함께핑_3.webp" alt="함께핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/함께핑_4.webp', '함께핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/함께핑_4.webp', '함께핑')">
         <img src="티니핑도안/함께핑_4.webp" alt="함께핑" loading="lazy">
       </div>
     </div>
@@ -1219,10 +1211,10 @@
   <div class="group" data-name="핫케핑">
     <h2 class="group-title">핫케핑 <span class="cnt">2</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/핫케핑-1-1.jpg', '핫케핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/핫케핑-1-1.jpg', '핫케핑')">
         <img src="티니핑도안/핫케핑-1-1.jpg" alt="핫케핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/핫케핑_2.webp', '핫케핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/핫케핑_2.webp', '핫케핑')">
         <img src="티니핑도안/핫케핑_2.webp" alt="핫케핑" loading="lazy">
       </div>
     </div>
@@ -1230,28 +1222,28 @@
   <div class="group" data-name="해핑">
     <h2 class="group-title">해핑 <span class="cnt">8</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/해핑_1.webp', '해핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/해핑_1.webp', '해핑')">
         <img src="티니핑도안/해핑_1.webp" alt="해핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/해핑_2.webp', '해핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/해핑_2.webp', '해핑')">
         <img src="티니핑도안/해핑_2.webp" alt="해핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/해핑_3.webp', '해핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/해핑_3.webp', '해핑')">
         <img src="티니핑도안/해핑_3.webp" alt="해핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/해핑_4.webp', '해핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/해핑_4.webp', '해핑')">
         <img src="티니핑도안/해핑_4.webp" alt="해핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/해핑_5.webp', '해핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/해핑_5.webp', '해핑')">
         <img src="티니핑도안/해핑_5.webp" alt="해핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/해핑_6.webp', '해핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/해핑_6.webp', '해핑')">
         <img src="티니핑도안/해핑_6.webp" alt="해핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/해핑_7.webp', '해핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/해핑_7.webp', '해핑')">
         <img src="티니핑도안/해핑_7.webp" alt="해핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/해핑_8.webp', '해핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/해핑_8.webp', '해핑')">
         <img src="티니핑도안/해핑_8.webp" alt="해핑" loading="lazy">
       </div>
     </div>
@@ -1259,13 +1251,13 @@
   <div class="group" data-name="행운핑">
     <h2 class="group-title">행운핑 <span class="cnt">3</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/행운핑_1.webp', '행운핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/행운핑_1.webp', '행운핑')">
         <img src="티니핑도안/행운핑_1.webp" alt="행운핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/행운핑_2.webp', '행운핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/행운핑_2.webp', '행운핑')">
         <img src="티니핑도안/행운핑_2.webp" alt="행운핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/행운핑_3.webp', '행운핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/행운핑_3.webp', '행운핑')">
         <img src="티니핑도안/행운핑_3.webp" alt="행운핑" loading="lazy">
       </div>
     </div>
@@ -1273,46 +1265,22 @@
   <div class="group" data-name="훌라핑">
     <h2 class="group-title">훌라핑 <span class="cnt">4</span></h2>
     <div class="group-grid">
-      <div class="card" onclick="openModal('티니핑도안/훌라핑_2.webp', '훌라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/훌라핑_2.webp', '훌라핑')">
         <img src="티니핑도안/훌라핑_2.webp" alt="훌라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/훌라핑_3.webp', '훌라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/훌라핑_3.webp', '훌라핑')">
         <img src="티니핑도안/훌라핑_3.webp" alt="훌라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/훌라핑_4.webp', '훌라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/훌라핑_4.webp', '훌라핑')">
         <img src="티니핑도안/훌라핑_4.webp" alt="훌라핑" loading="lazy">
       </div>
-      <div class="card" onclick="openModal('티니핑도안/훌라핑_5.webp', '훌라핑')">
+      <div class="card" onclick="pick(this, '티니핑도안/훌라핑_5.webp', '훌라핑')">
         <img src="티니핑도안/훌라핑_5.webp" alt="훌라핑" loading="lazy">
       </div>
     </div>
   </div>
 
-<div class="modal" id="modal" onclick="closeModal()">
-  <div class="modal-img-wrap" onclick="event.stopPropagation()">
-    <img id="modal-img" src="" alt="">
-  </div>
-  <div class="modal-footer" onclick="event.stopPropagation()">
-    <span class="modal-name" id="modal-name"></span>
-    <button class="btn-print" onclick="printImage(event)">🖨️ 인쇄</button>
-    <a class="btn-print" id="open-img" href="#" target="_blank" rel="noopener" onclick="event.stopPropagation(); this.href=document.getElementById('modal-img').src">🖼️ 사진만 열기</a>
-    <span class="ver">인쇄 v4</span>
-  </div>
-</div>
 <script>
-function openModal(src, name) {
-  document.getElementById('modal-img').src = src;
-  preparePrint(src);
-  document.getElementById('modal-name').textContent = name;
-  document.getElementById('modal').classList.add('open');
-  document.body.classList.add('modal-open');
-}
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-  document.getElementById('modal-img').src = '';
-  document.body.classList.remove('modal-open');
-}
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 function filterGroups() {
   const q = document.getElementById('search').value.trim().toLowerCase();
   document.querySelectorAll('.group').forEach(g => {
@@ -1320,8 +1288,12 @@ function filterGroups() {
     g.classList.toggle('hidden', q !== '' && !name.includes(q));
   });
 }
-function preparePrint(src) {
-  // 미리보기를 열 때 인쇄용 사진도 미리 불러둠 (인쇄 버튼에서 바로 print 하려고)
+// 도안을 한 번 누르면 선택(원본 미리 불러오기) → 한 번 더 누르면 바로 인쇄
+let picked = null;
+function pick(card, src) {
+  if (picked === card) { if (card.classList.contains('ready')) doPrint(); return; }
+  if (picked) picked.classList.remove('picked', 'ready');
+  picked = card; card.classList.add('picked');
   let area = document.getElementById('print-area');
   if (!area) {
     area = document.createElement('div'); area.id = 'print-area';
@@ -1329,20 +1301,20 @@ function preparePrint(src) {
     document.body.appendChild(area);
   }
   const img = area.querySelector('img');
-  if (img.src !== new URL(src, location.href).href) img.src = src;   // 같은 사진이면 다시 불러오지 않음
+  const ready = () => { if (picked === card) card.classList.add('ready'); };
+  if (img.src === new URL(src, location.href).href && img.complete && img.naturalWidth) ready();
+  else { img.onload = ready; img.src = src; }
 }
-function printImage(e) {
-  // iOS Safari는 버튼을 누른 그 순간에 바로 print 해야 차단하지 않음 → 기다리지 않고 즉시 호출
-  e.stopPropagation();
-  const m = document.getElementById('modal-img');
-  preparePrint(m.src);
+function doPrint() {
+  // iOS Safari는 누른 그 순간에 바로 print 해야 차단하지 않음
+  const area = document.getElementById('print-area'), img = area.querySelector('img');
   let pageStyle = document.getElementById('print-page-style');
   if (!pageStyle) { pageStyle = document.createElement('style'); pageStyle.id = 'print-page-style'; document.head.appendChild(pageStyle); }
-  const land = m.naturalWidth > m.naturalHeight;
+  const land = img.naturalWidth > img.naturalHeight;
   pageStyle.textContent = '@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:8mm;}';
-  document.getElementById('print-area').classList.toggle('land', land);
-  closeModal();          // 미리보기(이름·인쇄 버튼) 닫기
+  area.classList.toggle('land', land);
   window.print();
+  picked.classList.remove('picked', 'ready'); picked = null;
 }
 </script>
 </body>
