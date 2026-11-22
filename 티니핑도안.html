@@ -1290,36 +1290,43 @@ function filterGroups() {
     g.classList.toggle('hidden', q !== '' && !name.includes(q));
   });
 }
-// 도안을 한 번 누르면 선택(원본 미리 불러오기) → 한 번 더 누르면 바로 인쇄
+// 화면 근처에 온 도안은 원본을 미리 불러둠 → 누르면 그 자리에서 바로 인쇄 (iOS는 누른 순간에 print 해야 차단 안 함)
+const fullCache = new Map();
+function fullImg(src) {
+  const key = new URL(src, location.href).href;
+  let im = fullCache.get(key);
+  if (!im) { im = new Image(); im.src = src; fullCache.set(key, im); }
+  return im;
+}
+const cardSrc = c => c.dataset.full || c.querySelector('img').getAttribute('src');
+if ('IntersectionObserver' in window) {
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { fullImg(cardSrc(e.target)); io.unobserve(e.target); }
+  }), { rootMargin: '800px 0px' });
+  document.querySelectorAll('.card').forEach(c => io.observe(c));
+}
 let picked = null;
+function unpick() { if (picked) { picked.classList.remove('picked'); picked = null; } }
 function pick(card, src) {
-  if (picked === card) { if (card.classList.contains('ready')) doPrint(); return; }
-  if (picked) picked.classList.remove('picked', 'ready');
-  picked = card; card.classList.add('picked');
+  const im = fullImg(src);
+  if (im.complete && im.naturalWidth) { unpick(); printNow(im); return; }
+  // 아직 원본을 못 불러왔으면 ⏳ 표시 → 다 불러오면 🖨️ (그때 한 번 더 누르면 인쇄)
+  unpick(); picked = card; card.classList.add('picked');
   let mark = card.querySelector('.mark');
   if (!mark) { mark = document.createElement('span'); mark.className = 'mark'; card.appendChild(mark); }
   mark.textContent = '⏳';
-  let area = document.getElementById('print-area');
-  if (!area) {
-    area = document.createElement('div'); area.id = 'print-area';
-    area.appendChild(document.createElement('img'));
-    document.body.appendChild(area);
-  }
-  const img = area.querySelector('img');
-  const ready = () => { if (picked === card) { card.classList.add('ready'); mark.textContent = '🖨️'; } };
-  if (img.src === new URL(src, location.href).href && img.complete && img.naturalWidth) ready();
-  else { img.onload = ready; img.src = src; }
+  im.addEventListener('load', () => { if (picked === card) mark.textContent = '🖨️'; }, { once: true });
 }
-function doPrint() {
-  // iOS Safari는 누른 그 순간에 바로 print 해야 차단하지 않음
-  const area = document.getElementById('print-area'), img = area.querySelector('img');
+function printNow(im) {
+  let area = document.getElementById('print-area');
+  if (!area) { area = document.createElement('div'); area.id = 'print-area'; document.body.appendChild(area); }
+  area.innerHTML = ''; area.appendChild(im);
   let pageStyle = document.getElementById('print-page-style');
   if (!pageStyle) { pageStyle = document.createElement('style'); pageStyle.id = 'print-page-style'; document.head.appendChild(pageStyle); }
-  const land = img.naturalWidth > img.naturalHeight;
+  const land = im.naturalWidth > im.naturalHeight;
   pageStyle.textContent = '@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:8mm;}';
   area.classList.toggle('land', land);
   window.print();
-  picked.classList.remove('picked', 'ready'); picked = null;
 }
 </script>
 </body>
