@@ -72,9 +72,31 @@ const DATA = [{"p":1,"t":"10 Cute Fall Animal Coloring Pages for Kids – Free P
 })();
 </script>
 <script>
-// 도안을 누르면 → 인쇄 페이지(print.html)로 이동해 바로 인쇄 → 끝나면 이 목록으로 돌아옴
+// 도안을 누르면 → 그 사진 한 장만 있는 새 탭이 열리며 바로 인쇄 (iPad에서 잘 되던 방식, 탭은 직접 닫기)
 function pick(card, src) {
-  location.href = 'print.html?src=' + encodeURIComponent(new URL(src, location.href).pathname);
+  const url = new URL(src, location.href).href;
+  const pw = window.open('', '_blank');
+  if (!pw) { location.href = url; return; }   // 팝업이 막히면 사진으로 이동 (공유 → 프린트)
+  pw.document.write(`<!DOCTYPE html><html><head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>인쇄</title>
+  <style>
+    @page { margin: 0; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: white; }
+    body { box-sizing: border-box; padding: 7mm; }   /* 가장자리 잘림 방지 */
+    img { display: block; width: 100%; height: 100%; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  </style>
+  </head><body>
+  <img id="pimg" src="${url}">
+  <script>
+    document.getElementById('pimg').onload = function() {
+      var s = document.createElement('style');
+      s.textContent = '@page{size:A4 ' + (this.naturalWidth > this.naturalHeight ? 'landscape' : 'portrait') + ';margin:0;}';
+      document.head.appendChild(s);
+      window.print();
+    };
+  </scr` + `ipt>
+  </body></html>`);
+  pw.document.close();
 }
 </script>
 </body>
