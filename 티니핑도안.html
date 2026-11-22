@@ -47,6 +47,15 @@
     .group-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
     .card img { height: 200px; }
   }
+  #print-area { display: none; }
+  @media print {
+    body { background: white !important; padding: 0 !important; }
+    body > *:not(#print-area) { display: none !important; }
+    #print-area { display: block !important; }
+    /* 원본 비율 그대로, A4(여백 8mm) 안에 맞춤 — 잘리거나 확대되지 않게 */
+    #print-area img { display: block; margin: 0 auto; width: auto; height: auto; max-width: 193mm; max-height: 278mm; break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #print-area.land img { max-width: 280mm; max-height: 190mm; }
+  }
 </style>
 </head>
 <body>
@@ -1307,51 +1316,27 @@ function filterGroups() {
   });
 }
 function printImage(e) {
+  // 새 창 없이 이 페이지에서 바로 인쇄 (인쇄 전용 영역만 종이에 나오게 함)
   e.stopPropagation();
   const src = document.getElementById('modal-img').src;
-  const pw = window.open('', '_blank');
-  if (!pw) {
-    // iOS Safari 팝업 차단 시 이미지를 새 탭으로 열기 (공유 → AirPrint 사용)
-    const a = document.createElement('a');
-    a.href = src;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    return;
+  let area = document.getElementById('print-area');
+  if (!area) {
+    area = document.createElement('div'); area.id = 'print-area';
+    area.appendChild(document.createElement('img'));
+    document.body.appendChild(area);
   }
-  pw.document.write(`<!DOCTYPE html><html><head>
-  <meta charset="UTF-8">
-  <style>
-    @page { size: A4; margin: 8mm; }
-    * { margin: 0; padding: 0; }
-    html, body { background: white; }
-    html, body { margin: 0; padding: 0; }
-    /* 원본 비율 그대로, A4(여백 8mm) 안에 맞춤 — 잘리거나 확대되지 않게 */
-    img { display: block; margin: 0 auto; width: auto; height: auto; max-width: 193mm; max-height: 278mm; page-break-inside: avoid; break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    @media screen { img { max-width: 100vw; max-height: 100vh; } }
-    #close-btn { position: fixed; top: 12px; right: 12px; width: 48px; height: 48px; border-radius: 50%; background: rgba(0,0,0,0.5); color: white; font-size: 24px; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 9999; }
-    @media print { #close-btn { display: none !important; } }
-  </style>
-  </head><body>
-  <button id="close-btn" onclick="window.close()">✕</button>
-  <img id="pimg" src="${src}">
-  <script>
-    var img = document.getElementById('pimg');
-    var btn = document.getElementById('close-btn');
-    img.onload = function() {
-      var s = document.createElement('style');
-      var land = this.naturalWidth > this.naturalHeight;
-      s.textContent = '@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:8mm;}' + (land ? '@media print{img{max-width:280mm;max-height:190mm;}}' : '');
-      document.head.appendChild(s);
-      window.addEventListener('afterprint', function(){ window.close(); });
-      window.print();
-      btn.style.display = 'flex';
-    };
-  </scr` + `ipt>
-  </body></html>`);
-  pw.document.close();
+  let pageStyle = document.getElementById('print-page-style');
+  if (!pageStyle) { pageStyle = document.createElement('style'); pageStyle.id = 'print-page-style'; document.head.appendChild(pageStyle); }
+  const img = area.querySelector('img');
+  const go = () => {
+    const land = img.naturalWidth > img.naturalHeight;
+    pageStyle.textContent = '@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:8mm;}';
+    area.classList.toggle('land', land);
+    closeModal();          // 미리보기(이름·인쇄 버튼) 닫기
+    window.print();
+  };
+  if (img.getAttribute('src') === src && img.complete && img.naturalWidth) go();
+  else { img.onload = go; img.src = src; }
 }
 </script>
 </body>
