@@ -90,53 +90,9 @@ function filterGroups() {
   });
   document.getElementById('empty').classList.toggle('hidden', !!document.querySelector('.group:not(.hidden)'));
 }
-// 도안을 누르면 → 그 사진 한 장만 있는 새 창이 열리며 바로 인쇄 (예전에 iPad에서 차단 없이 되던 방식)
+// 도안을 누르면 → 인쇄 페이지(print.html)로 이동해 바로 인쇄 → 끝나면 이 목록으로 돌아옴
 function pick(card, src) {
-  const url = new URL(src, location.href).href;
-  const pw = window.open('', '_blank');
-  if (!pw) { location.href = url; return; }   // 팝업이 막히면 사진으로 이동 (공유 → 프린트)
-  pw.document.write(`<!DOCTYPE html><html><head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>인쇄</title>
-  <style>
-    @page { margin: 0; }
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: white; }
-    body { box-sizing: border-box; padding: 7mm; }   /* 가장자리 잘림 방지 */
-    img { display: block; width: 100%; height: 100%; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    #close-btn { position: fixed; top: 16px; right: 16px; padding: 18px 30px; border-radius: 40px; background: #e91e8c; color: white; font-size: 1.6rem; font-weight: 800; border: none; display: none; z-index: 9999; box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
-    @media print { #close-btn { display: none !important; } }
-  </style>
-  </head><body>
-  <button id="close-btn" onclick="window.close()">✕ 닫기</button>
-  <img id="pimg" src="${url}">
-  <script>
-    var img = document.getElementById('pimg');
-    var btn = document.getElementById('close-btn');
-    img.onload = function() {
-      var s = document.createElement('style');
-      s.textContent = '@page{size:A4 ' + (this.naturalWidth > this.naturalHeight ? 'landscape' : 'portrait') + ';margin:0;}';
-      document.head.appendChild(s);
-      // 인쇄가 끝나면 창 닫기. 아이패드 사파리는 인쇄 끝 신호(afterprint)를 안 줘서
-      // 인쇄 화면이 닫힌 뒤 돌아오는 신호(focus/visibility)와 '화면 아무 데나 누르기'로도 닫음
-      var closeNow = function(){ window.close(); };
-      window.addEventListener('afterprint', closeNow);
-      var t0 = Date.now();
-      window.print();
-      // 사파리는 인쇄 화면이 떠 있는 동안 여기서 멈춰 있다가, 인쇄(또는 취소)를 누르면 다음 줄로 넘어옴
-      // → 바로 닫기. (멈추지 않는 브라우저는 아래 신호들로 닫음)
-      if (Date.now() - t0 > 500) { setTimeout(closeNow, 300); return; }
-      btn.style.display = 'block';
-      setTimeout(function(){
-        var away = false;
-        window.addEventListener('blur', function(){ away = true; });
-        window.addEventListener('focus', function(){ if (away) closeNow(); });
-        document.addEventListener('visibilitychange', function(){ if (document.hidden) away = true; else if (away) closeNow(); });
-        document.addEventListener('touchstart', closeNow, { once: true });
-        document.addEventListener('mousedown', closeNow, { once: true });
-      }, 600);
-    };
-  </scr` + `ipt>
-  </body></html>`);
-  pw.document.close();
+  location.href = 'print.html?src=' + encodeURIComponent(new URL(src, location.href).pathname);
 }
 </script>
 </body>
