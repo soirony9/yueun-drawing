@@ -115,9 +115,20 @@ function pick(card, src) {
       var s = document.createElement('style');
       s.textContent = '@page{size:A4 ' + (this.naturalWidth > this.naturalHeight ? 'landscape' : 'portrait') + ';margin:0;}';
       document.head.appendChild(s);
-      window.addEventListener('afterprint', function(){ window.close(); });
+      // 인쇄가 끝나면 창 닫기. 아이패드 사파리는 인쇄 끝 신호(afterprint)를 안 줘서
+      // 인쇄 화면이 닫힌 뒤 돌아오는 신호(focus/visibility)와 '화면 아무 데나 누르기'로도 닫음
+      var closeNow = function(){ window.close(); };
+      window.addEventListener('afterprint', closeNow);
       window.print();
       btn.style.display = 'block';
+      setTimeout(function(){
+        var away = false;
+        window.addEventListener('blur', function(){ away = true; });
+        window.addEventListener('focus', function(){ if (away) closeNow(); });
+        document.addEventListener('visibilitychange', function(){ if (document.hidden) away = true; else if (away) closeNow(); });
+        document.addEventListener('touchstart', closeNow, { once: true });
+        document.addEventListener('mousedown', closeNow, { once: true });
+      }, 600);
     };
   </scr` + `ipt>
   </body></html>`);
