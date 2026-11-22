@@ -111,6 +111,7 @@ const DATA = [{"p":1,"t":"10 Cute Fall Animal Coloring Pages for Kids – Free P
 <script>
 function openModal(src, name) {
   document.getElementById('modal-img').src = src;
+  preparePrint(src);
   document.getElementById('modal-name').textContent = name;
   document.getElementById('modal').classList.add('open');
   document.body.classList.add('modal-open');
@@ -129,28 +130,29 @@ function filterGroups() {
   });
   document.getElementById('empty').classList.toggle('hidden', !!document.querySelector('.group:not(.hidden)'));
 }
-function printImage(e) {
-  // 새 창 없이 이 페이지에서 바로 인쇄 (인쇄 전용 영역만 종이에 나오게 함)
-  e.stopPropagation();
-  const src = document.getElementById('modal-img').src;
+function preparePrint(src) {
+  // 미리보기를 열 때 인쇄용 사진도 미리 불러둠 (인쇄 버튼에서 바로 print 하려고)
   let area = document.getElementById('print-area');
   if (!area) {
     area = document.createElement('div'); area.id = 'print-area';
     area.appendChild(document.createElement('img'));
     document.body.appendChild(area);
   }
+  const img = area.querySelector('img');
+  if (img.src !== new URL(src, location.href).href) img.src = src;   // 같은 사진이면 다시 불러오지 않음
+}
+function printImage(e) {
+  // iOS Safari는 버튼을 누른 그 순간에 바로 print 해야 차단하지 않음 → 기다리지 않고 즉시 호출
+  e.stopPropagation();
+  const m = document.getElementById('modal-img');
+  preparePrint(m.src);
   let pageStyle = document.getElementById('print-page-style');
   if (!pageStyle) { pageStyle = document.createElement('style'); pageStyle.id = 'print-page-style'; document.head.appendChild(pageStyle); }
-  const img = area.querySelector('img');
-  const go = () => {
-    const land = img.naturalWidth > img.naturalHeight;
-    pageStyle.textContent = '@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:8mm;}';
-    area.classList.toggle('land', land);
-    closeModal();          // 미리보기(이름·인쇄 버튼) 닫기
-    window.print();
-  };
-  if (img.getAttribute('src') === src && img.complete && img.naturalWidth) go();
-  else { img.onload = go; img.src = src; }
+  const land = m.naturalWidth > m.naturalHeight;
+  pageStyle.textContent = '@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:8mm;}';
+  document.getElementById('print-area').classList.toggle('land', land);
+  closeModal();          // 미리보기(이름·인쇄 버튼) 닫기
+  window.print();
 }
 </script>
 </body>
