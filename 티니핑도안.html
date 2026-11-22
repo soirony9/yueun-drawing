@@ -1305,7 +1305,11 @@ function pick(card, src) {
       // 인쇄 화면이 닫힌 뒤 돌아오는 신호(focus/visibility)와 '화면 아무 데나 누르기'로도 닫음
       var closeNow = function(){ window.close(); };
       window.addEventListener('afterprint', closeNow);
+      var t0 = Date.now();
       window.print();
+      // 사파리는 인쇄 화면이 떠 있는 동안 여기서 멈춰 있다가, 인쇄(또는 취소)를 누르면 다음 줄로 넘어옴
+      // → 바로 닫기. (멈추지 않는 브라우저는 아래 신호들로 닫음)
+      if (Date.now() - t0 > 500) { setTimeout(closeNow, 300); return; }
       btn.style.display = 'block';
       setTimeout(function(){
         var away = false;
